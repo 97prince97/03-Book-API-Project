@@ -13,24 +13,64 @@
 
 //what are all the API that we need....
 
-//BOOKS
+//-------------------------------------------------------------
 
+//BOOKS
 //we need an API
+
+// GET
 //to get all books ✔
 //to get specific books ✔
 //to get list of books based on category ✔
 //to get list of books based on languages ✔
 
-//AUTHORS
+// POST
+//Add new book ✔
 
+// PUT
+//Update book title ✔
+//Update/add new author for a book ✔
+
+// DELETE
+//Delete a book
+//Delete an author
+
+//-------------------------------------------------------------------
+
+// AUTHORS
 //we need an API
-// to get all authors ✔
+
+// GET
+//to get all authors ✔
 //to get specific authors ✔
 //to get list of authors based on books ✔
 
-//PUBLICATIONS
+// POST
+//add new author ✔
 
+// PUT
+//update author name ✔
+
+// DELETE
+//delete an author
+
+//-------------------------------------------------------------------
+
+// PUBLICATIONS
 //we need an API
+
+// GET
 //to get all publications ✔
 //to get specific publications ✔
 //to get list of publication based on book ✔
+
+// POST
+//add new publication ✔
+
+// PUT
+//update publication name ✔
+//update/add books to publication
+
+// DELETE
+//delete a publication
+//delete a book from publication
