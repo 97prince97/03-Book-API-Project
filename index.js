@@ -1,13 +1,26 @@
+require("dotenv").config();
+//Frame Works
 const express = require("express");
+const mongoose = require("mongoose");
 
 //Database
-const database = require("./database");
+const database = require("./database/database");
 
 //Initialization
 const booky = express();
 
 //configuration
 booky.use(express.json());
+
+//Establish Database connection
+mongoose
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then(() => console.log("!!!Connection Established!!!!!!"));
 
 /*
 Route           /
@@ -335,14 +348,13 @@ booky.put("/publication/update/book/:isbn", (req, res) => {
   //update the book database
   database.books.forEach((book) => {
     if (book.ISBN === req.params.isbn) {
-      book.publications = req.body.pubId;
-      return;
+      return book.publications.push(req.body.pubId);
     }
   });
   return res.json({
+    message: "successfully updated publication",
     books: database.books,
     publications: database.publications,
-    message: "successfully updated publication",
   });
 });
 

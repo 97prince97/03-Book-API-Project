@@ -4,9 +4,9 @@ let books = [
     title: "Getting started with MERN",
     pubDate: "2021-07-07",
     language: ["en", "hindi", "korean"],
-    numPage: 250,
+    numOfPage: 250,
     authors: [1, 2],
-    publication: [1],
+    publications: [1],
     category: ["tech", "programming", "education", "thriller"],
   },
 
