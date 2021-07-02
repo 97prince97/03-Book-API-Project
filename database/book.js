@@ -8,11 +8,11 @@ const BookSchema = mongoose.Schema({
   language: [String],
   numOfPage: Number,
   authors: [Number],
-  publications: [1],
+  publications: [Number],
   category: [String],
 });
 
 //Creating a book model
-const BookModel = mongoose.model("books", BookSchema);
+const BookModel = mongoose.model("books", BookSchema); //books=create a books document
 
 module.exports = BookModel;
