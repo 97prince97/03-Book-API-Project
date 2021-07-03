@@ -291,21 +291,40 @@ Parameter       NONE
 Methods         PUT
 */
 
-booky.put("/book/update/author/:isbn/:authorId", (req, res) => {
+booky.put("/book/update/author/:isbn/:authorId", async (req, res) => {
   //update book database
 
-  database.books.forEach((book) => {
-    if (book.ISBN === req.params.isbn) {
-      return book.authors.push(parseInt(req.params.authorId));
+  const updatedBook = await BookModel.findOneAndUpdate(
+    {
+      ISBN: req.params.isbn,
+    },
+    {
+      $addToSet: {
+        authors: parseInt(req.params.authorId),
+      },
+    },
+    {
+      new: true,
     }
-  });
+  );
 
   //update the author database
-  database.authors.forEach((author) => {
-    if (author.id === parseInt(req.params.authorId))
-      return author.books.push(req.params.isbn);
-  });
-  return res.json({ books: database.books, authors: database.authors });
+
+  const updatedAuthor = await AuthorModel.findOneAndUpdate(
+    {
+      id: parseInt(req.params.authorId),
+    },
+    {
+      $addToSet: {
+        books: req.params.isbn,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  return res.json({ books: updatedBook, authors: updatedAuthor });
 });
 
 /*
@@ -384,7 +403,8 @@ Parameter       isbn
 Methods         DELETE
 */
 
-booky.delete("/book/delete/:isbn", (req, res) => {
+booky.delete("/book/delete/:isbn", async (req, res) => {
+  const updatedBooks = await BookModel.findOneAndDelete();
   const updatedBookDatabase = database.books.filter(
     (book) => book.ISBN !== req.params.isbn
   );
