@@ -49,10 +49,10 @@
 //add new author ✔ 👌
 
 // PUT
-//update author name ✔
+//update author name ✔ 👌
 
 // DELETE
-//delete an author ✔
+//delete an author ✔ 👌
 
 //-------------------------------------------------------------------
 
@@ -68,9 +68,9 @@
 //add new publication ✔ 👌
 
 // PUT
-//update publication name ✔
-//update/add books to publication ✔
+//update publication name ✔ 👌
+//update/add books to publication ✔ 👌
 
 // DELETE
-//delete a publication ✔
+//delete a publication ✔ 👌
 //delete a book from publication
