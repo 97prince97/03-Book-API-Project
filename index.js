@@ -10,6 +10,7 @@ const database = require("./database/database");
 const BookModel = require("./database/book");
 const AuthorModel = require("./database/author");
 const PublicationModel = require("./database/publication");
+const { parse } = require("dotenv");
 
 //Initialization
 const booky = express();
@@ -226,7 +227,6 @@ booky.post("/book/new", async (req, res) => {
   const { newBook } = req.body;
   const AddNewBook = await BookModel.create(newBook);
 
-  // database.books.push(newBook);
   return res.json({ books: AddNewBook, message: "book was added!" });
 });
 
@@ -404,12 +404,11 @@ Methods         DELETE
 */
 
 booky.delete("/book/delete/:isbn", async (req, res) => {
-  const updatedBooks = await BookModel.findOneAndDelete();
-  const updatedBookDatabase = database.books.filter(
-    (book) => book.ISBN !== req.params.isbn
-  );
-  database.books = updatedBookDatabase;
-  return res.json({ books: database.books });
+  const updatedBookDatabase = await BookModel.findOneAndDelete({
+    ISBN: req.params.isbn,
+  });
+
+  return res.json({ books: updatedBookDatabase, message: "book is deleted!" });
 });
 
 /*
@@ -420,29 +419,37 @@ Parameter       isbn, authorId
 Methods         DELETE
 */
 
-booky.delete("/book/delete/author/:isbn/:authorId", (req, res) => {
+booky.delete("/book/delete/author/:isbn/:authorId", async (req, res) => {
   //update the book database
-  database.books.forEach((book) => {
-    if (book.ISBN === req.params.isbn) {
-      const newAuthorList = book.authors.filter(
-        (author) => author !== parseInt(req.params.authorId)
-      );
-      book.authors = newAuthorList;
-      return;
+  const updatedBook = await BookModel.findOneAndUpdate(
+    {
+      ISBN: req.params.isbn,
+    },
+    {
+      $pull: {
+        authors: parseInt(req.params.authorId),
+      },
+    },
+    {
+      new: true,
     }
-  });
+  );
 
   //update the author database
-  database.authors.forEach((author) => {
-    if (author.id === parseInt(req.params.authorId)) {
-      const newBookList = author.books.filter(
-        (book) => book !== req.params.isbn
-      );
-      author.books = newBookList;
-      return;
+  const updatedAuthor = await AuthorModel.findOneAndUpdate(
+    {
+      id: parseInt(req.params.authorId),
+    },
+    {
+      $pull: {
+        books: req.params.isbn,
+      },
+    },
+    {
+      new: true,
     }
-  });
-  return res.json({ book: database.books, author: database.authors });
+  );
+  return res.json({ book: updatedBook, author: updatedAuthor });
 });
 
 /*
