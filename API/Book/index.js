@@ -13,8 +13,12 @@ Methods         GET
 */
 
 Router.get("/", async (req, res) => {
-  const getAllBooks = await BookModel.find();
-  return res.json({ getAllBooks });
+  try {
+    const getAllBooks = await BookModel.find();
+    return res.json({ getAllBooks });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
@@ -88,10 +92,14 @@ Methods         POST
 */
 
 Router.post("/new", async (req, res) => {
-  const { newBook } = req.body;
-  const AddNewBook = await BookModel.create(newBook);
+  try {
+    const { newBook } = req.body;
+    const AddNewBook = await BookModel.create(newBook);
 
-  return res.json({ books: AddNewBook, message: "book was added!" });
+    return res.json({ books: AddNewBook, message: "book was added!" });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
