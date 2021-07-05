@@ -13,8 +13,12 @@ Methods         GET
 */
 
 Router.get("/", async (req, res) => {
-  const getAllPublication = await PublicationModel.find();
-  return res.json({ publications: getAllPublication });
+  try {
+    const getAllPublication = await PublicationModel.find();
+    return res.json({ publications: getAllPublication });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
@@ -26,16 +30,20 @@ Router.get("/", async (req, res) => {
   */
 
 Router.get("/id/:ID", async (req, res) => {
-  const getSpecificPublication = await PublicationModel.findOne({
-    id: parseInt(req.params.ID),
-  });
-
-  if (!getSpecificPublication) {
-    return res.json({
-      error: `No book found for the author of ${req.params.ID}`,
+  try {
+    const getSpecificPublication = await PublicationModel.findOne({
+      id: parseInt(req.params.ID),
     });
+
+    if (!getSpecificPublication) {
+      return res.json({
+        error: `No book found for the author of ${req.params.ID}`,
+      });
+    }
+    return res.json({ publication: getSpecificPublication });
+  } catch (error) {
+    return res.json({ error: error.message });
   }
-  return res.json({ publication: getSpecificPublication });
 });
 
 /*
@@ -47,16 +55,20 @@ Router.get("/id/:ID", async (req, res) => {
   */
 
 Router.get("/book/:isbn", async (req, res) => {
-  const publicationsBasedOnBook = await PublicationModel.find({
-    books: req.params.isbn,
-  });
-
-  if (!publicationsBasedOnBook) {
-    return res.json({
-      error: `No Publications found for the book of isbn ${req.params.isbn}`,
+  try {
+    const publicationsBasedOnBook = await PublicationModel.find({
+      books: req.params.isbn,
     });
+
+    if (!publicationsBasedOnBook) {
+      return res.json({
+        error: `No Publications found for the book of isbn ${req.params.isbn}`,
+      });
+    }
+    return res.json({ book: publicationsBasedOnBook });
+  } catch (error) {
+    return res.json({ error: error.message });
   }
-  return res.json({ book: publicationsBasedOnBook });
 });
 
 /*
@@ -68,9 +80,13 @@ Methods         POST
 */
 
 Router.post("/new", async (req, res) => {
-  const { newPublication } = req.body;
-  const addNewPublication = await PublicationModel.create(newPublication);
-  return res.json({ publication: addNewPublication });
+  try {
+    const { newPublication } = req.body;
+    const addNewPublication = await PublicationModel.create(newPublication);
+    return res.json({ publication: addNewPublication });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
@@ -82,19 +98,23 @@ Methods         PUT
 */
 
 Router.put("/update/name/:id", async (req, res) => {
-  const updatedPublication = await PublicationModel.findOneAndUpdate(
-    {
-      id: parseInt(req.params.id),
-    },
-    {
-      name: req.body.newPublicationName,
-    },
-    {
-      new: true,
-    }
-  );
+  try {
+    const updatedPublication = await PublicationModel.findOneAndUpdate(
+      {
+        id: parseInt(req.params.id),
+      },
+      {
+        name: req.body.newPublicationName,
+      },
+      {
+        new: true,
+      }
+    );
 
-  return res.json({ Publication: updatedPublication });
+    return res.json({ Publication: updatedPublication });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
@@ -106,40 +126,44 @@ Router.put("/update/name/:id", async (req, res) => {
   */
 
 Router.put("/update/book/:isbn", async (req, res) => {
-  //update the publication database
-  const updatedPublication = await PublicationModel.findOneAndUpdate(
-    {
-      id: req.body.pubId,
-    },
-    {
-      $addToSet: {
-        books: req.params.isbn,
+  try {
+    //update the publication database
+    const updatedPublication = await PublicationModel.findOneAndUpdate(
+      {
+        id: req.body.pubId,
       },
-    },
-    {
-      new: true,
-    }
-  );
+      {
+        $addToSet: {
+          books: req.params.isbn,
+        },
+      },
+      {
+        new: true,
+      }
+    );
 
-  //update the book database
-  const updatedBookDatabase = await BookModel.findOneAndUpdate(
-    {
-      ISBN: req.params.isbn,
-    },
-    {
-      $addToSet: {
-        publications: req.body.pubId,
+    //update the book database
+    const updatedBookDatabase = await BookModel.findOneAndUpdate(
+      {
+        ISBN: req.params.isbn,
       },
-    },
-    {
-      new: true,
-    }
-  );
-  return res.json({
-    message: "successfully updated publication",
-    books: updatedBookDatabase,
-    publications: updatedPublication,
-  });
+      {
+        $addToSet: {
+          publications: req.body.pubId,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    return res.json({
+      message: "successfully updated publication",
+      books: updatedBookDatabase,
+      publications: updatedPublication,
+    });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
@@ -151,13 +175,17 @@ Methods         DELETE
 */
 
 Router.delete("/delete/:id", async (req, res) => {
-  const updatedPublicationDatabase = await PublicationModel.findOneAndDelete({
-    id: parseInt(req.params.id),
-  });
-  return res.json({
-    publication: updatedPublicationDatabase,
-    message: "Publication was deleted!",
-  });
+  try {
+    const updatedPublicationDatabase = await PublicationModel.findOneAndDelete({
+      id: parseInt(req.params.id),
+    });
+    return res.json({
+      publication: updatedPublicationDatabase,
+      message: "Publication was deleted!",
+    });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 /*
@@ -169,39 +197,43 @@ Router.delete("/delete/:id", async (req, res) => {
   */
 
 Router.delete("/delete/book/:isbn/:pubId", async (req, res) => {
-  //update publication database
-  const updatedPublicationDatabase = await PublicationModel.findOneAndUpdate(
-    {
-      id: parseInt(req.params.pubId),
-    },
-    {
-      $pull: {
-        books: req.params.isbn,
+  try {
+    //update publication database
+    const updatedPublicationDatabase = await PublicationModel.findOneAndUpdate(
+      {
+        id: parseInt(req.params.pubId),
       },
-    },
-    {
-      new: true,
-    }
-  );
-  //updating book database
-  const updatedBookDatabase = await BookModel.findOneAndUpdate(
-    {
-      ISBN: req.params.isbn,
-    },
-    {
-      $pull: {
-        publications: parseInt(req.params.pubId),
+      {
+        $pull: {
+          books: req.params.isbn,
+        },
       },
-    },
-    {
-      new: true,
-    }
-  );
-  return res.json({
-    message: "Book was deleted from publication!",
-    publication: updatedPublicationDatabase,
-    book: updatedBookDatabase,
-  });
+      {
+        new: true,
+      }
+    );
+    //updating book database
+    const updatedBookDatabase = await BookModel.findOneAndUpdate(
+      {
+        ISBN: req.params.isbn,
+      },
+      {
+        $pull: {
+          publications: parseInt(req.params.pubId),
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    return res.json({
+      message: "Book was deleted from publication!",
+      publication: updatedPublicationDatabase,
+      book: updatedBookDatabase,
+    });
+  } catch (error) {
+    return res.json({ error: error.message });
+  }
 });
 
 module.exports = Router;
